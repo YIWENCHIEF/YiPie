@@ -1,0 +1,250 @@
+/* YiPie 设置页样式（M2 T3）。
+ * 轮盘相关色值必须与 src/wheel_window.cpp ThemeFor() 色表逐字一致（spec §5）：
+ *   dark  fill(0.086,0.086,0.10,.85)=(22,22,26,.85)  hl(0.42,0.30,1.0,.92)=(107,77,255,.92)
+ *         border(255,255,255,.20)  text(255,255,255,.92)  textSel(255,255,255,.98)
+ *   light fill(0.96,0.96,0.98,.92)=(245,245,250,.92) hl(0.35,0.22,0.85,.95)=(89,56,217,.95)
+ *         border(0,0,0,.15)  text(0.1,0.1,0.12,.95)=(26,26,31,.95)  textSel=(20,20,26,.98)
+ */
+:root, html[data-theme="dark"] {
+  --bg: #17171b;
+  --panel: #1f1f25;
+  --panel-2: #26262e;
+  --line: rgba(255, 255, 255, 0.08);
+  --text: #f0f0f3;
+  --muted: #9a9aa5;
+  --accent: #6b4dff;
+  --accent-soft: rgba(107, 77, 255, 0.16);
+  --danger: #ff6b6b;
+  --ok: #4dd07a;
+  /* 轮盘预览色（与渲染器一致） */
+  --wheel-fill: rgba(22, 22, 26, 0.85);
+  --wheel-hl: rgba(107, 77, 255, 0.92);
+  --wheel-border: rgba(255, 255, 255, 0.20);
+  --wheel-text: rgba(255, 255, 255, 0.92);
+  --wheel-text-sel: rgba(255, 255, 255, 0.98);
+  --wheel-text-glow: rgba(0, 0, 0, 0.62);
+}
+html[data-theme="light"] {
+  --bg: #f5f5f7;
+  --panel: #ffffff;
+  --panel-2: #ececf1;
+  --line: rgba(0, 0, 0, 0.08);
+  --text: #1a1a1f;
+  --muted: #6d6d78;
+  --accent: #5938d9;
+  --accent-soft: rgba(89, 56, 217, 0.12);
+  --danger: #d33a3a;
+  --ok: #1d9e50;
+  --wheel-fill: rgba(245, 245, 250, 0.92);
+  --wheel-hl: rgba(89, 56, 217, 0.95);
+  --wheel-border: rgba(0, 0, 0, 0.15);
+  --wheel-text: rgba(26, 26, 31, 0.95);
+  --wheel-text-sel: rgba(20, 20, 26, 0.98);
+  --wheel-text-glow: rgba(255, 255, 255, 0.85);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; overflow: hidden; }
+body {
+  font-family: "Segoe UI Variable Text", "Microsoft YaHei UI", "Segoe UI", sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.layout { display: flex; height: 100%; }
+
+/* —— 左导航 —— */
+.sidenav {
+  width: 168px; flex: 0 0 auto;
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  padding: 16px 10px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.brand { font-weight: 700; font-size: 16px; padding: 4px 10px 14px; color: var(--accent); }
+.nav-btn {
+  text-align: left; padding: 9px 12px; border: 0; border-radius: 8px;
+  background: transparent; color: var(--text); font-size: 14px; cursor: pointer;
+}
+.nav-btn:hover { background: var(--panel-2); }
+.nav-btn.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+/* —— 主区 —— */
+/* 固定窗口 = 固定画布：禁止出现滚动条轨道（M3b 人工反馈） */
+.content { flex: 1; overflow: hidden; padding: 14px 22px; }
+.crumb {
+  font-size: 13px; color: var(--muted); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.page.hidden { display: none; }
+h2 { font-size: 17px; margin: 0 0 14px; }
+.hint { color: var(--muted); font-size: 12.5px; }
+
+/* —— 卡片与控件 —— */
+.card {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 14px;
+  /* 卡片尺寸固定：窗口固定大小后不随内容/边框膨胀；
+     min-width 不设——侧栏 320px 内也要装得下 */
+  width: 100%; max-width: 560px;
+}
+.field { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
+.field label { flex: 0 0 120px; color: var(--text); }
+.field .range-note { color: var(--muted); font-size: 11.5px; margin-left: 6px; }
+/* M3b 人工反馈：滑块固定宽度，不随行拉伸/随触碰变长 */
+.field input[type="range"] { flex: 0 0 220px; width: 220px; accent-color: var(--accent); }
+.field select, .field input[type="text"] {
+  background: var(--panel-2); color: var(--text);
+  border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; flex: 1;
+  min-width: 0;  /* 允许收缩：否则 input 默认 ~180px 最小宽会把行尾按钮挤出抽屉 */
+}
+/* .switch 本身是 <label>，必须用更高特异性覆盖 .field label 的 120px 拉伸 */
+.field label.switch { flex: 0 0 auto; }
+.switch { position: relative; width: 40px; height: 22px; flex: 0 0 auto; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch span {
+  position: absolute; inset: 0; border-radius: 11px; cursor: pointer;
+  background: var(--panel-2); border: 1px solid var(--line); transition: 0.15s;
+}
+.switch span::before {
+  content: ""; position: absolute; width: 16px; height: 16px; border-radius: 50%;
+  left: 2px; top: 2px; background: var(--muted); transition: 0.15s;
+}
+.switch input:checked + span { background: var(--accent); border-color: var(--accent); }
+.switch input:checked + span::before { transform: translateX(18px); background: #fff; }
+
+button.primary {
+  background: var(--accent); color: #fff; border: 0; border-radius: 7px;
+  padding: 7px 14px; cursor: pointer; font-size: 13.5px;
+}
+button.primary:hover { filter: brightness(1.1); }
+button.ghost {
+  background: transparent; color: var(--text); border: 1px solid var(--line);
+  border-radius: 7px; padding: 6px 12px; cursor: pointer; font-size: 13px;
+}
+button.ghost:hover { background: var(--panel-2); }
+button.danger { color: var(--danger); border-color: var(--danger); background: transparent;
+  border-radius: 7px; padding: 6px 12px; cursor: pointer; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 20px;
+  padding: 3px 10px; margin: 3px 4px 3px 0; font-size: 12.5px; cursor: pointer;
+}
+.chip:hover { border-color: var(--accent); }
+.chip .x { color: var(--muted); font-style: normal; }
+
+/* —— 轮盘页布局 —— */
+/* 轮盘页永不换行：右侧收缩不会把卡片挤到预览下方 */
+.wheel-grid { display: flex; flex-wrap: nowrap; gap: 16px; align-items: stretch; justify-content: flex-start; height: calc(100vh - 96px); }
+.preview-col { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; justify-content: center; }
+.side-col { flex: 0 0 360px; width: 360px; min-width: 0; }
+/* 侧栏卡片内：短标签 + 210px 固定滑块，整行 320px 内容区放得下不溢出 */
+.side-col .card { max-width: none; }
+.side-col .field label { flex: 0 0 64px; }
+.side-col .field input[type="range"] { flex: 0 0 210px; width: 210px; }
+/* SVG 尺寸由 page-wheel.js 按容器实测显式设置（CSS auto+aspect-ratio 在
+   flex 里会塌缩为 0，教训记录在此）；viewBox 等比缩放，内部几何/命中不变 */
+#preview-host { width: 100%; height: 100%; display: flex;
+  align-items: center; justify-content: center; }
+#preview { display: block; user-select: none; -webkit-user-select: none; touch-action: none; }
+#preview .sector-group { cursor: grab; }
+#preview text { cursor: default; }
+#preview .iconimg { pointer-events: none; }
+#preview text { user-select: none; -webkit-user-select: none; pointer-events: none; }
+#preview .sector { fill: var(--wheel-fill); stroke: var(--wheel-border); stroke-width: 1; cursor: pointer; }
+#preview .sector:hover, #preview .sector.hl { fill: var(--wheel-hl); }
+#preview .sector.selected { fill: var(--wheel-hl); }
+#preview .label { fill: var(--wheel-text); font-size: 11px; pointer-events: none;
+  paint-order: stroke; stroke: var(--wheel-text-glow); stroke-width: 3px; stroke-linejoin: round; }
+#preview .label.selected { fill: var(--wheel-text-sel); }
+#preview .label.empty { fill: var(--muted); font-size: 14px; }
+#preview .pointer-line { stroke: #fff; stroke-width: 2; opacity: 0.9; }
+#preview .sector.sub { opacity: 0.75; }
+#preview .label { fill: var(--wheel-text); }
+#preview .glyph { font-family: "Segoe MDL2 Assets"; font-size: 17px; fill: var(--wheel-text); pointer-events: none;
+  paint-order: stroke; stroke: var(--wheel-text-glow); stroke-width: 3px; stroke-linejoin: round; }
+#preview .glyph.selected { fill: var(--wheel-text-sel); }
+
+/* —— 动作抽屉 —— */
+.drawer {
+  position: fixed; top: 0; right: 0; height: 100%; width: 340px;
+  background: var(--panel); border-left: 1px solid var(--line);
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.25);
+  transform: translateX(100%); transition: transform 0.2s ease;
+  padding: 18px; overflow-y: auto; z-index: 20;
+}
+.drawer.open { transform: translateX(0); }
+.drawer h3 { margin: 0 0 4px; font-size: 15px; }
+.drawer .sub { color: var(--muted); font-size: 12px; margin-bottom: 14px; }
+.seg { display: flex; gap: 6px; margin: 8px 0 14px; }
+.seg button {
+  flex: 1; padding: 7px 0; border-radius: 7px; border: 1px solid var(--line);
+  background: var(--panel-2); color: var(--text); cursor: pointer; font-size: 13px;
+}
+.seg button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.recorder {
+  border: 1px dashed var(--line); border-radius: 7px; padding: 9px 10px;
+  cursor: pointer; color: var(--muted); min-height: 38px; font-family: Consolas, monospace;
+}
+.recorder.armed { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.drawer .field label { flex: 0 0 56px; }
+.drawer-close { position: absolute; top: 14px; right: 14px; border: 0; background: none;
+  color: var(--muted); font-size: 18px; cursor: pointer; }
+
+/* —— toast —— */
+.toast {
+  position: fixed; right: 18px; bottom: 18px; max-width: 380px;
+  background: var(--panel-2); color: var(--text); border: 1px solid var(--line);
+  border-left: 3px solid var(--accent); border-radius: 8px;
+  padding: 10px 14px; font-size: 13px; z-index: 50;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+.toast.error { border-left-color: var(--danger); }
+.toast.hidden { display: none; }
+
+/* —— M3b 子动作折叠区 —— */
+.sub-title { font-size: 12.5px; color: var(--muted); margin: 16px 0 8px; }
+.sub-row { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 6px;
+  background: var(--panel-2); }
+.sub-head { display: flex; align-items: center; gap: 8px; padding: 8px 10px; cursor: pointer; }
+.sub-caret { color: var(--muted); font-size: 10px; width: 12px; }
+.sub-label { flex: 1; font-size: 13px; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; }
+.sub-remove { flex: 0 0 auto; padding: 3px 8px; font-size: 12px; }
+.sub-body { padding: 4px 10px 10px; border-top: 1px solid var(--line); }
+.sub-body .field label { flex: 0 0 48px; }
+
+/* —— M3c 图标选择器 —— */
+.icon-preview { display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 7px;
+  background: var(--panel-2); font-size: 18px; flex: 0 0 auto; }
+.icon-preview.muted { font-size: 11px; color: var(--muted); }
+.icon-pop { position: fixed; z-index: 100; width: 330px; max-height: 420px; overflow-y: auto;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  padding: 12px 14px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+.icon-sec-title { font-size: 12px; color: var(--muted); margin: 10px 0 6px; }
+.icon-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.icon-cell { width: 34px; height: 34px; display: inline-flex; align-items: center;
+  justify-content: center; font-size: 18px; background: var(--panel-2);
+  border: 1px solid var(--line); border-radius: 7px; cursor: pointer; color: var(--text); }
+.icon-cell:hover { border-color: var(--accent); }
+.icon-cell.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.icon-cell.img { font-size: 0; }
+
+#preview .sector.disc { transition: r 60ms ease; }
+
+/* M3c 外观并入侧栏：行距收紧，四张卡片一屏放得下 */
+#appearance-host .field { margin: 7px 0; }
+#appearance-host .card, .side-col > #appearance-host .card { margin-bottom: 0; }
+.side-col { display: flex; flex-direction: column; gap: 12px; }
+
+/* 修复：.side-col .field label 与 .field label.switch 同特异性且在后，开关又被拉长
+   —— 用更高特异性把开关恢复为固定 40x22 */
+.side-col .field label.switch, .drawer .field label.switch { flex: 0 0 auto; width: 40px; }
+
+/* M3d：常用预设折叠条 */
+.chips-toggle { background: none; border: 0; color: var(--muted); font-size: 12px;
+  cursor: pointer; padding: 2px 0 4px; text-align: left; }
+.chips-toggle:hover { color: var(--accent); }

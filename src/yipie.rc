@@ -1,0 +1,7 @@
+// YiPie resources: application/tray icon (M1.1-3).
+// The first ICON entry also becomes the exe file icon (resource table order).
+#include <winres.h>
+
+#define IDI_YIPIE 101
+
+IDI_YIPIE ICON "..\\assets\\app.ico"

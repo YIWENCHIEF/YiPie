@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<title>YiPie 设置</title>
+<link rel="stylesheet" href="settings.css">
+</head>
+<body>
+<div class="layout">
+  <nav class="sidenav">
+    <div class="brand">YiPie</div>
+    <button class="nav-btn active" data-page="wheel">轮盘</button>
+    <button class="nav-btn" data-page="gesture">手势</button>
+    <button class="nav-btn" data-page="system">系统</button>
+  </nav>
+  <main class="content">
+    <header class="crumb" id="crumb">轮盘</header>
+
+    <section class="page" id="page-wheel">
+      <div class="wheel-grid">
+        <div class="preview-col">
+          <div id="preview-host">
+            <svg id="preview" viewBox="0 0 420 420" preserveAspectRatio="xMidYMid meet">
+              <text x="210" y="210" text-anchor="middle" class="muted">编辑器加载中…</text>
+            </svg>
+          </div>
+        </div>
+        <div class="side-col">
+          <div id="profile-host" class="card"></div>
+          <div id="sector-slider-host" class="card"></div>
+          <div id="appearance-host"></div>
+        </div>
+      </div>
+      <div id="drawer-host"></div>
+    </section>
+
+    <section class="page hidden" id="page-gesture">
+      <h2>手势</h2><p class="hint">M2 建设中（Task 5 填充）</p>
+    </section>
+    <section class="page hidden" id="page-system">
+      <h2>系统</h2><p class="hint">M2 建设中（Task 5 填充）</p>
+    </section>
+  </main>
+</div>
+<div id="toast" class="toast hidden"></div>
+<script type="module">
+import "./page-wheel.js";
+import "./page-settings.js";
+import { boot } from "./app.js";
+boot().catch(err => {
+  document.body.insertAdjacentHTML("beforeend",
+    "<pre style='color:#f66;padding:1em'>启动失败: " + err.message + "</pre>");
+});
+</script>
+</body>
+</html>

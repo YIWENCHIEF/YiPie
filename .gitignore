@@ -1,0 +1,8 @@
+build/
+build-release/
+build-probe/
+dist/
+*.obj
+.superpowers/
+build-rel/
+src/glyph_table.generated.h
